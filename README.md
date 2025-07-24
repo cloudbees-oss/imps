@@ -1,6 +1,6 @@
 # IMPS
 
-WARNING: CloudBees maintains this fork of the original repository and applies only essential security fixes to support its customers. The use of the images or Helm chart published in this project is NOT supported for external purposes. Utilizing these images or charts is at your own risk.
+**WARNING**: CloudBees maintains this fork of the original repository and applies only essential security fixes to support its customers. The use of the images or Helm chart published in this project is **NOT** supported for external purposes. Utilizing these images or charts is at your own risk.
 
 IMPS (IMagePullSecrets) controller is a Kubernetes operator that manages pull secrets based label or annotation
 selectors. It natively supports ECR and standard docker configuration secrets.
