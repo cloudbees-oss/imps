@@ -121,9 +121,5 @@ jobs:
           fi
 
       - if: ${{ steps.set-helm-push-enabled.outputs.helm_push_enabled == 1 }}
-        name: Install Helm ChartMuseum push plugin
-        run: helm plugin install "https://github.com/chartmuseum/helm-push.git" --version "${{ env.HELM_PLUGIN_CHARTMUSEUM_PUSH_VERSION }}"
-
-      - if: ${{ steps.set-helm-push-enabled.outputs.helm_push_enabled == 1 }}
         name: Push Helm chart
         run: helm push "${{ steps.package-chart.outputs.helm_package_path }}" "${{ env.HELM_PUSH_REPOSITORY_NAME }}"
