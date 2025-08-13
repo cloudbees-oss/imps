@@ -115,7 +115,7 @@ jobs:
             exit 1
           fi
 
-          if helm pull "${{ env.HELM_PUSH_REPOSITORY_NAME }}/${{ steps.set-chart-name.outputs.chart_name }}" --version "${ACTUAL_CHART_VERSION}" --dry-run 2>/dev/null; then
+          if helm pull "${{ env.HELM_PUSH_REPOSITORY_NAME }}/${{ steps.set-chart-name.outputs.chart_name }}" --version "${ACTUAL_CHART_VERSION}" --destination /tmp 2>/dev/null; then
               printf >&2 "chart version already exists in the repository, repository: %s, name: %s, version: %s" "${{ env.HELM_PUSH_REPOSITORY_NAME }}" "${{ steps.set-chart-name.outputs.chart_name }}" "${ACTUAL_CHART_VERSION}"
               exit 1
           fi
