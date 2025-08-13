@@ -55,7 +55,7 @@ func (r *ImagePullSecretReconciler) setReadyStatus(ctx context.Context, imps *v1
 	imps.Status.Reason = ""
 	imps.Status.ManagedNamespaces = targetNamespaces
 	if pullSecretExpires != nil {
-		imps.Status.ValiditySeconds = int32(time.Until(*pullSecretExpires) / time.Second)
+		imps.Status.ValiditySeconds = int64(time.Until(*pullSecretExpires) / time.Second)
 	} else {
 		imps.Status.ValiditySeconds = 0
 	}
@@ -139,7 +139,6 @@ func (r *ImagePullSecretReconciler) reconcileImagePullSecret(ctx context.Context
 	// Reconcile secrets in selected namespaces
 	for _, namespaceName := range targetNamespaces {
 		err = r.reconcileSecretInNamespace(imps, namespaceName, renderedPullSecret)
-
 		if err != nil {
 			r.Log.Warn("cannot reconcile secret in namespace, skipping", map[string]interface{}{
 				"ns":    namespaceName,

@@ -1,7 +1,6 @@
 package ecr
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -83,13 +82,12 @@ func TestTokenManager_GetAuthorizationToken(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			mockClient := &MockECRClient{}
 			mockClient.On("GetAuthorizationToken", mock.Anything, mock.Anything).Return(tt.mockTokenOutput, nil)
 
-			found, err := tt.tokenManager.GetAuthorizationToken(context.Background(), tt.args.key, mockClient)
+			found, err := tt.tokenManager.GetAuthorizationToken(t.Context(), tt.args.key, mockClient)
 
 			if tt.expectedErr != nil {
 				assert.Equal(t, tt.expectedErr.Error(), err.Error())
@@ -124,7 +122,6 @@ func TestTokenManager_discardOldTokens(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tt.tokenManager.discardOldTokens()
@@ -193,7 +190,6 @@ func TestTokenManager_updateTokens(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			mockClient := &MockECRClient{}
@@ -234,7 +230,6 @@ func TestTokenManager_NewECRTokenManager(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewECRTokenManager(tt.args.logger)

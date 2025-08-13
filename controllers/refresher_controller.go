@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/banzaicloud/imps/internal/cron"
 	"github.com/banzaicloud/imps/pkg/pullsecrets"
@@ -50,7 +49,8 @@ type RefresherReconciler struct {
 
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 func (r *RefresherReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	result, err := r.reconcile(ctx, req)
+	err := r.reconcile(ctx, req)
+	result := ctrl.Result{}
 	result, err = cron.EnsurePeriodicReconcile(r.PeriodicReconcileInterval, result, err)
 	if err != nil {
 		r.ErrorHandler.Handle(err)
@@ -62,16 +62,15 @@ func (r *RefresherReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 func (r *RefresherReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Secret{}, ctrlBuilder.WithPredicates(predicate.GenerationChangedPredicate{})).
-		Watches(
-			&source.Kind{Type: &corev1.Secret{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				return r.isMatchingSecret(object)
+		Watches(&corev1.Secret{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []reconcile.Request {
+				return r.isMatchingSecret(ctx, object)
 			}))
 
 	return builder.Complete(r)
 }
 
-func (r *RefresherReconciler) isMatchingSecret(obj client.Object) []ctrl.Request {
+func (r *RefresherReconciler) isMatchingSecret(_ context.Context, obj client.Object) []ctrl.Request {
 	secret, ok := obj.(*corev1.Secret)
 	if !ok {
 		r.Log.Info("object is not a Secret")
@@ -106,25 +105,24 @@ func (r *RefresherReconciler) isTargetSecret(secret types.NamespacedName) bool {
 	return r.TargetSecret.Namespace == secret.Namespace && r.TargetSecret.Name == secret.Name
 }
 
-func (r *RefresherReconciler) reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *RefresherReconciler) reconcile(ctx context.Context, req ctrl.Request) error {
 	logger := logur.WithField(r.Log, "imagepullsecret", req.NamespacedName)
-	result := ctrl.Result{}
 
 	if !r.isSourceSecret(req.NamespacedName) && !r.isTargetSecret(req.NamespacedName) {
-		return result, nil
+		return nil
 	}
 
 	config := pullsecrets.NewConfigFromSecrets(ctx, r, r.SourceSecrets)
 	resultingConfig, err := config.ResultingDockerConfig(ctx)
 	if err != nil {
-		return result, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	pullSecret := resultingConfig.AsSecret(r.TargetSecret.Namespace, r.TargetSecret.Name)
 
 	_, err = r.ResourceReconciler.ReconcileResource(pullSecret, reconciler.StatePresent)
 	if err != nil {
-		return result, err
+		return err
 	}
 
 	if err := resultingConfig.AsError(); err != nil {
@@ -137,12 +135,12 @@ func (r *RefresherReconciler) reconcile(ctx context.Context, req ctrl.Request) (
 			}
 		}
 
-		return result, err
+		return err
 	}
 
 	logger.Info("successfully reconciled secret", map[string]interface{}{
 		"expiration": resultingConfig.Expiration,
 	})
 
-	return result, nil
+	return nil
 }

@@ -1,7 +1,6 @@
 package pullsecrets
 
 import (
-	"context"
 	"testing"
 
 	"gotest.tools/assert"
@@ -44,7 +43,6 @@ func TestStaticLoginCredentialProvider_NewStaticLoginCredentialProvider(t *testi
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewStaticLoginCredentialProvider(tt.args.parsedDockerConfig)
@@ -84,10 +82,9 @@ func TestStaticLoginCredentialProvider_LoginCredentials(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found, err := tt.staticLoginCredentialProvider.LoginCredentials(context.Background())
+			found, err := tt.staticLoginCredentialProvider.LoginCredentials(t.Context())
 
 			assert.DeepEqual(t, tt.wanted, found)
 			assert.NilError(t, err)

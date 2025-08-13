@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        target: [ "distroless", "ubi8" ]
+        target: [ "distroless" ]
 
     permissions:
       contents: read
@@ -54,32 +54,42 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18 # v2.1.0
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4b4e9c3e2d4531116a6f8ba8e71fc6e2cb6e6c8c # v2.5.0
+        uses: docker/setup-buildx-action@v3
 
       - name: Set up Cosign
-        uses: sigstore/cosign-installer@9e9de2292db7abb3f51b7f4808d98f0d347a8919 # v3.0.2
+        uses: sigstore/cosign-installer@v3
         with:
           cosign-release: v2.0.1
         if: inputs.publish
 
       - name: Set up Syft
-        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # v0.14.1
+        uses: anchore/sbom-action/download-syft@v0.20.4
         with:
           syft-version: v0.76.1
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_IAM_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set image name
         id: image-name
-        run: echo "value=ghcr.io/${{ github.repository_owner }}/imagepullsecrets" >> "$GITHUB_OUTPUT"
+        run: echo "value=${{ vars.IMPS_IMAGE_REGISTRY }}/services/imagepullsecrets" >> "$GITHUB_OUTPUT"
 
       - name: Gather build metadata
         id: meta
-        uses: docker/metadata-action@c4ee3adeed93b1fa6a762f209fb01608c1a22f1e # v4.4.0
+        uses: docker/metadata-action@v5
         with:
           images: ${{ steps.image-name.outputs.value }}
           flavor: |
@@ -95,7 +105,7 @@ jobs:
       # Multiple exporters are not supported yet
       # See https://github.com/moby/buildkit/pull/2760
       - name: Determine build output
-        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        uses: haya14busa/action-cond@v1.2.1
         id: build-output
         with:
           cond: ${{ inputs.publish }}
@@ -104,24 +114,16 @@ jobs:
 
       # UBI8 does not support ARMv7
       - name: Determine platforms
-        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        uses: haya14busa/action-cond@v1.2.1
         id: platforms
         with:
           cond: ${{ matrix.target == 'ubi8' }}
           if_true: linux/amd64,linux/arm64
           if_false: linux/amd64,linux/arm64,linux/arm/v7
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-        if: inputs.publish
-
       - name: Build and push image
         id: build
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 # v4.0.0
+        uses: docker/build-push-action@v6
         with:
           context: .
           target: ${{ matrix.target }}
@@ -154,7 +156,7 @@ jobs:
         run: syft -o spdx-json=sbom-spdx.json docker-archive:docker.tar
 
       - name: Upload SBOM as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: "[${{ github.job }}] SBOM"
           path: sbom-spdx.json
@@ -175,21 +177,21 @@ jobs:
         if: inputs.publish
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2 # 0.10.0
+        uses: aquasecurity/trivy-action@0.32.0
         with:
           input: image
           format: sarif
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: "[${{ github.job }}] Trivy scan results"
           path: trivy-results.sarif
           retention-days: 5
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@6c089f53dd51dc3fc7e599c3cb5356453a52ca9e # v2.20.0
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif
 
@@ -200,7 +202,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        target: [ "distroless", "ubi8" ]
+        target: [ "distroless" ]
 
     permissions:
       contents: read
@@ -215,32 +217,42 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
+        uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@e81a89b1732b9c48d79cd809d8d81d79c4647a18 # v2.1.0
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4b4e9c3e2d4531116a6f8ba8e71fc6e2cb6e6c8c # v2.5.0
+        uses: docker/setup-buildx-action@v3
 
       - name: Set up Cosign
-        uses: sigstore/cosign-installer@9e9de2292db7abb3f51b7f4808d98f0d347a8919 # v3.0.2
+        uses: sigstore/cosign-installer@v3
         with:
           cosign-release: v2.0.1
         if: inputs.publish
 
       - name: Set up Syft
-        uses: anchore/sbom-action/download-syft@422cb34a0f8b599678c41b21163ea6088edb2624 # v0.14.1
+        uses: anchore/sbom-action/download-syft@v0.20.4
         with:
           syft-version: v0.76.1
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_IAM_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
       - name: Set image name
         id: image-name
-        run: echo "value=ghcr.io/${{ github.repository_owner }}/imagepullsecrets-refresher" >> "$GITHUB_OUTPUT"
+        run: echo "value=${{ vars.IMPS_IMAGE_REGISTRY }}/imagepullsecrets-refresher" >> "$GITHUB_OUTPUT"
 
       - name: Gather build metadata
         id: meta
-        uses: docker/metadata-action@c4ee3adeed93b1fa6a762f209fb01608c1a22f1e # v4.4.0
+        uses: docker/metadata-action@v5
         with:
           images: ${{ steps.image-name.outputs.value }}
           flavor: |
@@ -256,7 +268,7 @@ jobs:
       # Multiple exporters are not supported yet
       # See https://github.com/moby/buildkit/pull/2760
       - name: Determine build output
-        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        uses: haya14busa/action-cond@v1.2.1
         id: build-output
         with:
           cond: ${{ inputs.publish }}
@@ -265,24 +277,16 @@ jobs:
 
       # UBI8 does not support ARMv7
       - name: Determine platforms
-        uses: haya14busa/action-cond@1d6e8a12b20cdb4f1954feef9aa475b9c390cab5 # v1.1.1
+        uses: haya14busa/action-cond@v1.2.1
         id: platforms
         with:
           cond: ${{ matrix.target == 'ubi8' }}
           if_true: linux/amd64,linux/arm64
           if_false: linux/amd64,linux/arm64,linux/arm/v7
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a # v2.1.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-        if: inputs.publish
-
       - name: Build and push image
         id: build
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671 # v4.0.0
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile-refresher
@@ -316,7 +320,7 @@ jobs:
         run: syft -o spdx-json=sbom-spdx.json docker-archive:docker.tar
 
       - name: Upload SBOM as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: "[${{ github.job }}] SBOM"
           path: sbom-spdx.json
@@ -337,20 +341,20 @@ jobs:
         if: inputs.publish
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2 # 0.10.0
+        uses: aquasecurity/trivy-action@0.32.0
         with:
           input: image
           format: sarif
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: "[${{ github.job }}] Trivy scan results"
           path: trivy-results.sarif
           retention-days: 5
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@6c089f53dd51dc3fc7e599c3cb5356453a52ca9e # v2.20.0
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif

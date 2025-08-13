@@ -57,6 +57,6 @@ func (c *StringableCredentials) Retrieve(_ context.Context) (aws.Credentials, er
 	return c.Credentials, nil
 }
 
-func (c StringableCredentials) String() string {
+func (c *StringableCredentials) String() string {
 	return fmt.Sprintf("%s/%s/%s/%s", c.Region, c.AccessKeyID, c.SecretAccessKey, c.SessionToken)
 }

@@ -17,6 +17,7 @@ import (
 	logrintegration "logur.dev/integration/logr"
 	"logur.dev/logur"
 	ctrl "sigs.k8s.io/controller-runtime"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/banzaicloud/imps/api/v1alpha1"
 	"github.com/banzaicloud/imps/controllers"
@@ -75,9 +76,10 @@ func main() {
 	errorHandler := errorhandler.New(logger)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                  scheme,
-		MetricsBindAddress:      metricsAddr,
-		Port:                    9443,
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
 		LeaderElection:          enableLeaderElection,
 		LeaderElectionID:        "73de1ad9.banzaicloud.io",
 		LeaderElectionNamespace: configNamespace,

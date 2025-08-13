@@ -76,7 +76,6 @@ func TestRefresherReconciler_isTargetSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.refresherReconciler.isTargetSecret(tt.args.secret)
@@ -160,7 +159,6 @@ func TestRefresherReconciler_isSourceSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.refresherReconciler.isSourceSecret(tt.args.secret)
@@ -269,10 +267,9 @@ func TestRefresherReconciler_isMatchingSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found := tt.refresherReconciler.isMatchingSecret(tt.args.obj)
+			found := tt.refresherReconciler.isMatchingSecret(t.Context(), tt.args.obj)
 
 			assert.Equal(t, tt.want, found)
 		})

@@ -11,8 +11,8 @@ CRD_OPTIONS ?= "crd"
 # TODO: Use this when allowDangerousTypes feature is released to support floats
 # CRD_OPTIONS ?= "crd:trivialVersions=true,allowDangerousTypes=true"
 LICENSEI_VERSION = 0.7.0
-GOLANGCI_VERSION ?= 1.52.2
-ENVTEST_K8S_VERSION = 1.26.0
+GOLANGCI_VERSION ?= 1.64.6
+ENVTEST_K8S_VERSION = 1.30.0
 
 
 

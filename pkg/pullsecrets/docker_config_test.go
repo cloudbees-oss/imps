@@ -1,7 +1,6 @@
 package pullsecrets
 
 import (
-	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -26,7 +25,6 @@ func TestDockerConfig_NewDockerRegistryConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewDockerRegistryConfig()
@@ -50,7 +48,6 @@ func TestDockerConfig_NewConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewConfig()
@@ -84,7 +81,6 @@ func TestDockerConfig_StaticProviderFromDockerConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.config.StaticProviderFromDockerConfig(tt.args.data)
@@ -129,7 +125,6 @@ func TestDockerConfig_getOptionalFieldFromMap(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := getOptionalFieldFromMap(tt.args.data, tt.args.key, tt.args.defaultVal)
@@ -171,7 +166,6 @@ func TestDockerConfig_getFieldFromMap(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found, err := getFieldFromMap(tt.args.data, tt.args.key)
@@ -220,7 +214,6 @@ func TestDockerConfig_ECRProviderFromSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.config.ECRProviderFromSecret(tt.args.data)
@@ -266,10 +259,9 @@ func TestDockerConfig_ResultingDockerConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found, err := tt.config.ResultingDockerConfig(context.Background())
+			found, err := tt.config.ResultingDockerConfig(t.Context())
 
 			assert.DeepEqual(t, tt.want, found)
 			assert.NilError(t, err)
@@ -309,7 +301,6 @@ func TestDockerConfig_AsSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.resultingDockerConfig.AsSecret(tt.args.secretNamespace, tt.args.secretName)

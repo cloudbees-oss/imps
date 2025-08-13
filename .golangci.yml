@@ -1,9 +1,3 @@
-run:
-  skip-dirs:
-    - .gen
-  skip-files:
-    - ".*zz_.*\\.go$"
-
 linters:
   enable-all: true
   disable:
@@ -16,21 +10,21 @@ linters:
     - godox
     - wsl
     - gocognit
-    - gomnd
     - godot
-    - goerr113
     - nestif
     - testpackage
     - nolintlint
     - wrapcheck
     - varnamelen
     - ireturn
-    - exhaustivestruct
     - exhaustruct
     - gomoddirectives
     - exhaustive
     - cyclop
-    - ifshort
+    - perfsprint
+    - mnd
+    - depguard
+    - tenv
 
 linters-settings:
   golint:
@@ -60,3 +54,9 @@ issues:
   - linters:
       - stylecheck
     text: "ST1016"
+
+  exclude-files:
+    - ".*zz_.*\\.go$"
+
+  exclude-dirs:
+    - .gen

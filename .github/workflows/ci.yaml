@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  GO_VERSION: '1.20'
+  GO_VERSION: '1.24'
 
 permissions:
   contents: read
@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
 
@@ -60,10 +60,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
 
@@ -76,10 +76,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
 

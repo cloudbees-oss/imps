@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2" //nolint:revive
+	. "github.com/onsi/gomega"    //nolint:revive
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	logrintegration "logur.dev/integration/logr"
@@ -27,7 +27,6 @@ var (
 	cfg       *rest.Config
 	k8sClient client.Client
 	testEnv   *envtest.Environment
-	ctx       context.Context
 	cancel    context.CancelFunc
 )
 
@@ -41,6 +40,7 @@ func TestControllers(t *testing.T) {
 var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
+	var ctx context.Context
 	ctx, cancel = context.WithCancel(context.TODO())
 
 	By("bootstrapping test environment")
