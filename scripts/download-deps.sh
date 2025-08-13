@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-controller_gen_version=0.9.2
+controller_gen_version=0.18.0
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 binpath=${script_dir}/../bin

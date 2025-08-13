@@ -69,10 +69,9 @@ func TestToken_NewECRToken(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found, err := NewECRToken(context.Background(), tt.args.creds, tt.args.client)
+			found, err := NewECRToken(t.Context(), tt.args.creds, tt.args.client)
 
 			if tt.expectedErr != nil {
 				assert.Equal(t, tt.expectedErr.Error(), err.Error())
@@ -140,14 +139,13 @@ func TestToken_Refresh(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			mockClient := &MockECRClient{}
 			mockClient.On("GetAuthorizationToken", mock.Anything, mock.Anything).Return(tt.mockTokenOutput, nil)
 			tt.token.Client = mockClient
 
-			err := tt.token.Refresh(context.Background())
+			err := tt.token.Refresh(t.Context())
 
 			if tt.expectedErr != nil {
 				assert.Equal(t, tt.expectedErr.Error(), err.Error())

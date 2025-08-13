@@ -1,7 +1,6 @@
 package ecr
 
 import (
-	"context"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -37,10 +36,9 @@ func TestStringableCredentials_GetCreds(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found, err := tt.stringableCredentials.GetCreds(context.Background())
+			found, err := tt.stringableCredentials.GetCreds(t.Context())
 
 			assert.Equal(t, tt.want, found)
 			assert.NilError(t, err)
@@ -68,14 +66,13 @@ func TestStringableCredentials_ToAwsConfig(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.stringableCredentials.ToAwsConfig()
 
 			assert.Equal(t, tt.want.Region, found.Region)
-			wantedCred, _ := tt.want.Credentials.Retrieve(context.Background())
-			foundCreds, _ := found.Credentials.Retrieve(context.Background())
+			wantedCred, _ := tt.want.Credentials.Retrieve(t.Context())
+			foundCreds, _ := found.Credentials.Retrieve(t.Context())
 			assert.Equal(t, wantedCred, foundCreds)
 		})
 	}
@@ -108,10 +105,9 @@ func TestStringableCredentials_Retrieve(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			found, err := tt.stringableCredentials.Retrieve(context.Background())
+			found, err := tt.stringableCredentials.Retrieve(t.Context())
 
 			assert.Equal(t, tt.want, found)
 			assert.NilError(t, err)
@@ -157,7 +153,6 @@ func TestStringableCredentials_String(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.stringableCredentials.String()

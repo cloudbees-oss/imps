@@ -143,7 +143,6 @@ func TestImagePullSecret_SplitNamespacesByMatch(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			matchingNs, nonMatichingNs, err := tt.imagePullSecret.SplitNamespacesByMatch(tt.args.allNs)
@@ -229,7 +228,6 @@ func TestImagePullSecret_MatchesPod(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found, err := tt.imagePullSecret.MatchesPod(&tt.args.pod)
@@ -288,7 +286,6 @@ func TestImagePullSecret_MatchesNamespace(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found, err := tt.imagePullSecret.MatchesNamespace(&tt.args.ns)
@@ -336,7 +333,6 @@ func TestObjectSelectorConfiguration_IsEmpty(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.objectSelectorConfiguration.IsEmpty()
@@ -410,7 +406,6 @@ func TestObjectSelectorConfiguration_Matches(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found, err := tt.objectSelectorConfiguration.Matches(tt.args.meta)

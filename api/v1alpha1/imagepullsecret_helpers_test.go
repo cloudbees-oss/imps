@@ -40,7 +40,6 @@ func TestImagePullSecret_GetOwnerReferenceForOwnedObject(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.imagePullSecret.GetOwnerReferenceForOwnedObject()
@@ -94,7 +93,6 @@ func TestRegistryConfig_CredentialsAsNamespacedNameList(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.registryConfig.CredentialsAsNamespacedNameList()

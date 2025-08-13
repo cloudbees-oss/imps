@@ -52,7 +52,6 @@ func TestECRLoginCredentialsProvider_NewECRLoginCredentialsProvider(t *testing.T
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewECRLoginCredentialsProvider(tt.args.accountID, tt.args.region, tt.args.keyID, tt.args.secretAccessKey, tt.args.roleArn, nil)
@@ -84,7 +83,6 @@ func TestECRLoginCredentialsProvider_GetURL(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.ecrLoginCredentialsProvider.GetURL()
@@ -147,11 +145,10 @@ func TestECRLoginCredentialsProvider_LoginCredentials(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			impsEcr.Initialize(&logur.TestLogger{})
-			found, err := tt.ecrLoginCredentialsProvider.LoginCredentials(context.Background())
+			found, err := tt.ecrLoginCredentialsProvider.LoginCredentials(t.Context())
 
 			assert.DeepEqual(t, tt.wanted, found)
 			assert.NilError(t, err)

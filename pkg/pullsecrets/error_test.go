@@ -19,7 +19,6 @@ func TestError_NewErrorsPerSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := NewErrorsPerSecret()
@@ -49,7 +48,6 @@ func TestError_AddSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tt.errorsPerSecret.AddSecret(tt.args.name)
@@ -92,7 +90,6 @@ func TestError_SetSecretError(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tt.errorsPerSecret.SetSecretError(tt.args.name, tt.args.err)
@@ -123,7 +120,6 @@ func TestError_AsStatus(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.errorsPerSecret.AsStatus()
@@ -151,7 +147,6 @@ func TestError_FailedSecrets(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.errorsPerSecret.FailedSecrets()
@@ -184,7 +179,6 @@ func TestError_AsError(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := tt.errorsPerSecret.AsError()

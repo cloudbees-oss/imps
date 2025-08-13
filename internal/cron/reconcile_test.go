@@ -51,7 +51,6 @@ func TestCron_calculateRequeueAfter(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found := calculateRequeueAfter(tt.args.result, tt.args.periodicReconcileInterval)
@@ -103,7 +102,6 @@ func TestCron_EnsurePeriodicReconcile(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			found, err := EnsurePeriodicReconcile(tt.args.interval, tt.args.result, tt.args.err)

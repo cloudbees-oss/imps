@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/banzaicloud/imps/api/v1alpha1"
 	"github.com/banzaicloud/imps/internal/cron"
@@ -64,26 +63,23 @@ func (r *ImagePullSecretReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 func (r *ImagePullSecretReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	builder := ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.ImagePullSecret{}, ctrlBuilder.WithPredicates(predicate.GenerationChangedPredicate{})).
-		Watches(
-			&source.Kind{Type: &corev1.Namespace{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				return r.impsMatchingNamespace(object)
+		Watches(&corev1.Namespace{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []reconcile.Request {
+				return r.impsMatchingNamespace(ctx, object)
 			})).
-		Watches(
-			&source.Kind{Type: &corev1.Pod{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				return r.impsMatchingPod(object)
+		Watches(&corev1.Pod{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []reconcile.Request {
+				return r.impsMatchingPod(ctx, object)
 			})).
-		Watches(
-			&source.Kind{Type: &corev1.Secret{}},
-			handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
-				return r.impsReferencingSecret(object)
+		Watches(&corev1.Secret{},
+			handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, object client.Object) []reconcile.Request {
+				return r.impsReferencingSecret(ctx, object)
 			}))
 
 	return builder.Complete(r)
 }
 
-func (r *ImagePullSecretReconciler) impsMatchingNamespace(obj client.Object) []ctrl.Request {
+func (r *ImagePullSecretReconciler) impsMatchingNamespace(ctx context.Context, obj client.Object) []ctrl.Request {
 	ns, ok := obj.(*corev1.Namespace)
 	if !ok {
 		r.Log.Info("object is not a Namespace")
@@ -93,7 +89,7 @@ func (r *ImagePullSecretReconciler) impsMatchingNamespace(obj client.Object) []c
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err := r.Client.List(context.TODO(), impsList)
+	err := r.Client.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 
@@ -126,7 +122,7 @@ func (r *ImagePullSecretReconciler) impsMatchingNamespace(obj client.Object) []c
 	return res
 }
 
-func (r *ImagePullSecretReconciler) impsMatchingPod(obj client.Object) []ctrl.Request {
+func (r *ImagePullSecretReconciler) impsMatchingPod(ctx context.Context, obj client.Object) []ctrl.Request {
 	pod, ok := obj.(*corev1.Pod)
 	if !ok {
 		r.Log.Info("object is not a Pod or Namespace")
@@ -137,7 +133,7 @@ func (r *ImagePullSecretReconciler) impsMatchingPod(obj client.Object) []ctrl.Re
 	// If the namespace containing the pod matches, let's not add the pod to the reconciliation queue.
 	// This prevents reconciliations to start on each pod startup when the namespace selectors are properly used.
 	podsNamespace := &corev1.Namespace{}
-	err := r.Client.Get(context.TODO(), types.NamespacedName{
+	err := r.Client.Get(ctx, types.NamespacedName{
 		Name: pod.Namespace,
 	}, podsNamespace)
 	if err != nil {
@@ -150,7 +146,7 @@ func (r *ImagePullSecretReconciler) impsMatchingPod(obj client.Object) []ctrl.Re
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err = r.Client.List(context.TODO(), impsList)
+	err = r.Client.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 
@@ -194,7 +190,7 @@ func (r *ImagePullSecretReconciler) impsMatchingPod(obj client.Object) []ctrl.Re
 	return res
 }
 
-func (r *ImagePullSecretReconciler) impsReferencingSecret(obj client.Object) []ctrl.Request {
+func (r *ImagePullSecretReconciler) impsReferencingSecret(ctx context.Context, obj client.Object) []ctrl.Request {
 	secret, ok := obj.(*corev1.Secret)
 	if !ok {
 		r.Log.Info("object is not a Secret")
@@ -204,7 +200,7 @@ func (r *ImagePullSecretReconciler) impsReferencingSecret(obj client.Object) []c
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err := r.Client.List(context.TODO(), impsList)
+	err := r.Client.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 

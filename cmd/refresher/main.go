@@ -16,6 +16,7 @@ import (
 	logrintegration "logur.dev/integration/logr"
 	"logur.dev/logur"
 	ctrl "sigs.k8s.io/controller-runtime"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/banzaicloud/imps/controllers"
 	"github.com/banzaicloud/imps/internal/errorhandler"
@@ -98,8 +99,10 @@ func main() {
 	ctrl.SetLogger(logrintegration.New(logger))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: metricsAddr,
+		},
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

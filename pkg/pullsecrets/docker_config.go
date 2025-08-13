@@ -23,7 +23,6 @@ import (
 	"emperror.dev/errors"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/banzaicloud/imps/api/common"
@@ -42,7 +41,7 @@ type LoginCredentialsWithDetails struct {
 }
 
 type LoginCredentialProvider interface {
-	LoginCredentials(context.Context) ([]LoginCredentialsWithDetails, error)
+	LoginCredentials(ctx context.Context) ([]LoginCredentialsWithDetails, error)
 }
 
 type Config struct {
@@ -55,7 +54,7 @@ func NewConfig() *Config {
 	}
 }
 
-func NewConfigFromSecrets(ctx context.Context, c client.Client, refs []types.NamespacedName) *Config {
+func NewConfigFromSecrets(ctx context.Context, c client.Client, refs []client.ObjectKey) *Config {
 	var secret corev1.Secret
 	config := NewConfig()
 
@@ -113,7 +112,7 @@ func getOptionalFieldFromMap(data map[string][]byte, key string, defaultVal stri
 func getFieldFromMap(data map[string][]byte, key string) (string, error) {
 	value, found := data[key]
 	if !found {
-		return "", fmt.Errorf("no such key: %s", key)
+		return "", errors.Errorf("no such key: %s", key)
 	}
 
 	return string(value), nil
@@ -151,7 +150,7 @@ type ResultingDockerConfig struct {
 	Expiration     *time.Time
 }
 
-func (c Config) ResultingDockerConfig(ctx context.Context) (*ResultingDockerConfig, error) {
+func (c *Config) ResultingDockerConfig(ctx context.Context) (*ResultingDockerConfig, error) {
 	finalRegistryConfig := NewDockerRegistryConfig()
 	var minExpiration *time.Time
 	secretErrors := NewErrorsPerSecret()

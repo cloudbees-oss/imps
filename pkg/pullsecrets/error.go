@@ -59,7 +59,7 @@ func (e ErrorsPerSecret) FailedSecrets() []string {
 	return invalidSecrets
 }
 
-func (e *ErrorsPerSecret) AsError() error {
+func (e ErrorsPerSecret) AsError() error {
 	invalidSecrets := e.FailedSecrets()
 
 	if len(invalidSecrets) == 0 {
