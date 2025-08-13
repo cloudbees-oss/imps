@@ -225,8 +225,6 @@ jobs:
 
       - name: Set up Cosign
         uses: sigstore/cosign-installer@v3
-        with:
-          cosign-release: v2.0.1
         if: inputs.publish
 
       - name: Set up Syft
