@@ -85,7 +85,7 @@ jobs:
 
       - name: Set image name
         id: image-name
-        run: echo "value=${{ vars.IMPS_IMAGE_REGISTRY }}/services/imagepullsecrets" >> "$GITHUB_OUTPUT"
+        run: echo "value=${{ vars.IMPS_IMAGE_REGISTRY }}/imagepullsecrets" >> "$GITHUB_OUTPUT"
 
       - name: Gather build metadata
         id: meta
