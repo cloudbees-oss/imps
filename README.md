@@ -9,6 +9,20 @@ IMPS provides two modes of operation:
 - IMPS controller: a full fledged solution for managing and refreshing secrets in multiple namespaces
 - IMPS token refresher: a small utility that allows to refresh ECR tokens inside one namespace
 
+## Release process for repository owners
+
+To release a new version of the imps controller image(s) and chart, follow these steps:
+
+1. Ensure the version in the [Chart.yaml file](deploy/charts/imagepullsecrets/Chart.yaml) and the [values file](deploy/charts/imagepullsecrets/values.yaml) have been incremented as part of the review process.
+
+2. The GitHub workflows are designed to execute only on Pull requests for running the CI checks. Once merged to `main` the images are published to the CloudBees Pre-Prod Private ECR registry.
+
+3. To push a new version of the chart, create a new Git tag following the pattern `deploy/charts/vX.Y.Z`, where `X.Y.Z` is the new version of the Chart. This will trigger the Helm chart packaging and publishing process.
+
+4. To push a new version of the controller and refresher image, create a new Git tag following the pattern `vX.Y.Z`, where `X.Y.Z` is the new version of the Chart. This will trigger the image build and publishing process using the version of the Chart.
+
+5. Following the above steps, update the [version of the controller images, i.e 'imagepullsecrets' and 'imagepullsecrets-refresher' in the (internal) platform-helmfiles repo](https://github.com/calculi-corp/platform-helmfiles/blob/main/versioning/action_artifacts.json) and the [version of the HELM chart in the same (internal) repo](https://github.com/calculi-corp/platform-helmfiles/blob/main/versioning/imagepullsecrets.version).
+
 ## Using the token refresher
 
 The token refresher Docker images are available in the `ghcr.io/banzaicloud/imagepullsecrets-refresher` Docker Registry.
