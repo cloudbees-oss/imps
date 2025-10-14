@@ -1,3 +1,3 @@
 module github.com/banzaicloud/imps/deploy/charts
 
-go 1.24.4
+go 1.24.6
