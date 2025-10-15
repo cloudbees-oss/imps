@@ -1,6 +1,6 @@
 module github.com/banzaicloud/imps/api
 
-go 1.24.4
+go 1.24.6
 
 replace (
 	k8s.io/api => k8s.io/api v0.31.0
