@@ -161,7 +161,7 @@ func (r *ImagePullSecretReconciler) reconcileImagePullSecret(ctx context.Context
 	}
 
 	var ownedSecrets corev1.SecretList
-	err = r.Client.List(ctx, &ownedSecrets, client.MatchingLabels{
+	err = r.List(ctx, &ownedSecrets, client.MatchingLabels{
 		labelImpsOwnerUID: string(imps.UID),
 	})
 	if err != nil {
