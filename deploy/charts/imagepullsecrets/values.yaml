@@ -20,7 +20,7 @@ securityContext:
       - ALL
 image:
   repository: ghcr.io/banzaicloud/imagepullsecrets
-  tag: v0.3.14
+  tag: v0.3.15
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
