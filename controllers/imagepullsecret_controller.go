@@ -89,7 +89,7 @@ func (r *ImagePullSecretReconciler) impsMatchingNamespace(ctx context.Context, o
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err := r.Client.List(ctx, impsList)
+	err := r.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 
@@ -133,7 +133,7 @@ func (r *ImagePullSecretReconciler) impsMatchingPod(ctx context.Context, obj cli
 	// If the namespace containing the pod matches, let's not add the pod to the reconciliation queue.
 	// This prevents reconciliations to start on each pod startup when the namespace selectors are properly used.
 	podsNamespace := &corev1.Namespace{}
-	err := r.Client.Get(ctx, types.NamespacedName{
+	err := r.Get(ctx, types.NamespacedName{
 		Name: pod.Namespace,
 	}, podsNamespace)
 	if err != nil {
@@ -146,7 +146,7 @@ func (r *ImagePullSecretReconciler) impsMatchingPod(ctx context.Context, obj cli
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err = r.Client.List(ctx, impsList)
+	err = r.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 
@@ -200,7 +200,7 @@ func (r *ImagePullSecretReconciler) impsReferencingSecret(ctx context.Context, o
 
 	impsList := &v1alpha1.ImagePullSecretList{}
 
-	err := r.Client.List(ctx, impsList)
+	err := r.List(ctx, impsList)
 	if err != nil {
 		r.Log.Info(err.Error())
 

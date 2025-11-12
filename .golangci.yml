@@ -1,5 +1,41 @@
+version: 2
+
+run:
+  go: "1.25"
+  timeout: 5m
+
+format:
+  enable: [gofmt, goimports, gci]
+
+format-settings:
+  gci:
+    sections: [standard, default, "prefix(github.com/banzaicloud/imps)"]
+  goimports:
+    local-prefixes: github.com/banzaicloud/imps
+
 linters:
-  enable-all: true
+  enable:
+    - govet
+    - staticcheck        # covers what gosimple used to report
+    - errcheck
+    - ineffassign
+    - unused
+    - unparam
+    - nilerr
+    - errname
+    - forcetypeassert
+    - prealloc
+    - durationcheck
+    - copyloopvar        # replaces exportloopref
+    - misspell
+    - gosec
+    - dupl
+    - rowserrcheck
+    - sqlclosecheck
+    - tparallel
+    - whitespace
+    - gocyclo
+
   disable:
     - lll
     - gochecknoinits
@@ -24,39 +60,23 @@ linters:
     - perfsprint
     - mnd
     - depguard
-    - tenv
+    # - tenv  # removed in v2; keep it out
 
 linters-settings:
-  golint:
-    min-confidence: 0.1
   gocyclo:
     min-complexity: 40
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/banzaicloud/imps)
-  goimports:
-    local-prefixes: github.com/banzaicloud/imps
   gocritic:
-    disabled-checks:
-      - ifElseChain
+    disabled-checks: [ifElseChain]
 
 issues:
-  # mainly because of the operator, but we are using helm chart names
-  # as package names
   exclude:
     - underscore in package name
     - should not use underscores in package names
-
   exclude-rules:
-  # zz_ files are messing up the receiver name
-  - linters:
-      - stylecheck
-    text: "ST1016"
+    - linters: [stylecheck]
+      text: "ST1016"
 
   exclude-files:
     - ".*zz_.*\\.go$"
-
   exclude-dirs:
     - .gen
