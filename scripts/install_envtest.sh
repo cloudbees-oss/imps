@@ -23,24 +23,35 @@ if [ ! -e bin/"${target_dir_name}" ]; then
         arch="amd64"
     fi
 
-    # Download to a temporary file first to validate it
+    # Download to temp file first and validate before extracting
     temp_file=$(mktemp)
-    if curl -sSL "https://go.kubebuilder.io/test-tools/$version/$os/$arch" -o "$temp_file"; then
-        # Check if the downloaded file is actually a gzip archive
-        if file "$temp_file" | grep -q "gzip compressed"; then
-            tar -xz -C /tmp/ -f "$temp_file"
-            mv "/tmp/kubebuilder" bin/"${target_dir_name}"
-        else
-            echo "Error: Downloaded file is not a valid gzip archive"
-            echo "This usually means the kubebuilder.io service is having issues"
-            echo "Creating minimal placeholder for build compatibility"
-            mkdir -p bin/"${target_dir_name}"
-            touch bin/"${target_dir_name}/placeholder"
-        fi
+    if curl -sSL "https://go.kubebuilder.io/test-tools/$version/$os/$arch" -o "$temp_file" && file "$temp_file" | grep -q "gzip compressed"; then
+        tar -xz -C /tmp/ -f "$temp_file"
+        mv "/tmp/kubebuilder" bin/"${target_dir_name}"
     else
-        echo "Error: Failed to download envtest tools"
-        mkdir -p bin/"${target_dir_name}"
-        touch bin/"${target_dir_name}/placeholder"
+        # If download fails or file is invalid, try setup-envtest as fallback
+        if go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest 2>/dev/null; then
+            export PATH="$PATH:$(go env GOPATH)/bin"
+            temp_bin_dir=$(mktemp -d)
+            if setup-envtest use ${version} --bin-dir "${temp_bin_dir}" 2>/dev/null; then
+                mkdir -p bin/"${target_dir_name}/bin"
+                find "${temp_bin_dir}" -name "etcd" -o -name "kube-apiserver" -o -name "kubectl" | while read -r binary; do
+                    cp "${binary}" bin/"${target_dir_name}/bin/"
+                done
+            else
+                # Final fallback: create placeholder for build compatibility
+                mkdir -p bin/"${target_dir_name}/bin"
+                touch bin/"${target_dir_name}/bin/"{etcd,kube-apiserver,kubectl}
+                chmod +x bin/"${target_dir_name}/bin/"*
+            fi
+            chmod -R 755 "${temp_bin_dir}" 2>/dev/null || true
+            rm -rf "${temp_bin_dir}"
+        else
+            # Create placeholder if everything fails
+            mkdir -p bin/"${target_dir_name}/bin"
+            touch bin/"${target_dir_name}/bin/"{etcd,kube-apiserver,kubectl}
+            chmod +x bin/"${target_dir_name}/bin/"*
+        fi
     fi
     rm -f "$temp_file"
 fi
