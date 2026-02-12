@@ -23,6 +23,6 @@ if [ ! -e bin/"${target_dir_name}" ]; then
         arch="amd64"
     fi
 
-    curl -sSL "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${version}_darwin_${arch}.tar.gz" | tar -xz -C /tmp/
+    curl -sSL "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${version}_${os}_${arch}.tar.gz" | tar -xz -C /tmp/
     mv "/tmp/kubebuilder" bin/"${target_dir_name}"
 fi
