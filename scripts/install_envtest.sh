@@ -15,13 +15,15 @@ mkdir -p bin
 ln -s "${target_dir_name}" ${link_path}
 
 if [ ! -e bin/"${target_dir_name}" ]; then
-    os=$(go env GOOS)
-    arch=$(go env GOARCH)
-
-    # Temporary fix for Apple M1 until envtest is released for darwin-arm64 arch
-    if [ "$os" == "darwin" ] && [ "$arch" == "arm64" ]; then
-        arch="amd64"
+    echo "Installing envtest binaries for Kubernetes ${version}..."
+    
+    # Use setup-envtest tool from controller-runtime (official method)
+    go run sigs.k8s.io/controller-runtime/tools/setup-envtest@latest use "${version}" --bin-dir "bin/${target_dir_name}/bin" -p path >/dev/null
+    
+    if [ ! -d "bin/${target_dir_name}/bin" ]; then
+        echo "Failed to install envtest binaries for version ${version}" >&2
+        exit 1
     fi
-    curl -sSL "https://go.kubebuilder.io/test-tools/$version/$os/$arch" | tar -xz -C /tmp/
-    mv "/tmp/kubebuilder" bin/"${target_dir_name}"
+    
+    echo "Envtest binaries installed successfully"
 fi

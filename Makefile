@@ -49,7 +49,7 @@ endif
 all: build
 
 .PHONY: test
-test: ensure-tools generate fmt vet manifests 	## Run tests
+test: ensure-tools fmt vet 	## Run tests
 	KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test  ${GOARGS} ./... -coverprofile cover.out
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
@@ -73,10 +73,10 @@ lint-fix: bin/golangci-lint ## Run linter & fix
 	bin/golangci-lint run -c .golangci.yml --fix
 
 .PHONY: build
-build: generate fmt vet binary	## Build the binary
+build: fmt vet binary	## Build the binary
 
 .PHONY: build-refresher
-build-refresher: generate fmt vet binary-refresher	## Build the refresher binary
+build-refresher: fmt vet binary-refresher	## Build the refresher binary
 
 .PHONY: binary
 binary:					## Build the binary without executing any code generators
