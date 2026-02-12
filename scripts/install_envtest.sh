@@ -23,5 +23,5 @@ if [ ! -e bin/"${target_dir_name}" ]; then
         arch="amd64"
     fi
 
-    wget -O bin/"${target_dir_name}"/kubebuilder "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${os}_${arch}"
+    curl "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${os}_${arch}" --create-dirs -o bin/"${target_dir_name}"/kubebuilder
 fi
