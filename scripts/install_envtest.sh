@@ -47,12 +47,15 @@ if [ ! -e bin/"${target_dir_name}" ]; then
                     exit 1
                 fi
 
+                # Fix permissions before cleanup to avoid "permission denied" errors
+                chmod -R u+w "${temp_envtest_dir}" 2>/dev/null || true
                 rm -rf "${temp_envtest_dir}"
                 echo "Successfully installed envtest tools via setup-envtest"
             else
                 # Fail explicitly when we can't obtain real binaries
                 echo "ERROR: Failed to install envtest tools. setup-envtest installed but could not download version ${version}."
                 echo "This likely means version ${version} is not available from the envtest repository."
+                chmod -R u+w "${temp_envtest_dir}" 2>/dev/null || true
                 rm -rf "${temp_envtest_dir}"
                 exit 1
             fi
