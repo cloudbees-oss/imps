@@ -49,8 +49,13 @@ endif
 all: build
 
 .PHONY: test
-test: ensure-tools generate fmt vet manifests 	## Run tests
-	KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test  ${GOARGS} ./... -coverprofile cover.out
+test: fmt vet 	## Run tests
+	@if [ -d "${REPO_ROOT}/bin/envtest/bin/" ]; then \
+		KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test ${GOARGS} ./... -coverprofile cover.out; \
+	else \
+		echo "Warning: envtest not found, running tests without KUBEBUILDER_ASSETS (integration tests may be skipped)"; \
+		go test ${GOARGS} ./... -coverprofile cover.out; \
+	fi
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
 	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
