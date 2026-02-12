@@ -28,7 +28,7 @@ if [ ! -e bin/"${target_dir_name}" ]; then
         tar -xz -C /tmp/ -f "$temp_file"
         mv "/tmp/kubebuilder" bin/"${target_dir_name}"
     else
-        # Fallback: try setup-envtest or create placeholder
+        # Fallback: try setup-envtest to obtain the binaries if the download fails or is not a valid gzip file
         if go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest 2>/dev/null && setup-envtest use ${version} --bin-dir /tmp/envtest 2>/dev/null; then
             mkdir -p bin/"${target_dir_name}/bin"
             find /tmp/envtest -name "etcd" -o -name "kube-apiserver" -o -name "kubectl" | while read -r binary; do
