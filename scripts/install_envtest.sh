@@ -23,6 +23,5 @@ if [ ! -e bin/"${target_dir_name}" ]; then
         arch="amd64"
     fi
 
-    curl -sSL "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${version}_${os}_${arch}.tar.gz" | tar -xz -C /tmp/
-    mv "/tmp/kubebuilder" bin/"${target_dir_name}"
+    wget -O bin/"${target_dir_name}"/kubebuilder "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${os}_${arch}"
 fi
