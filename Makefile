@@ -49,13 +49,8 @@ endif
 all: build
 
 .PHONY: test
-test: fmt vet 	## Run tests
-	@if [ ! -f "${REPO_ROOT}/bin/envtest/bin/etcd" ]; then \
-		echo "Warning: envtest binaries not found, skipping integration tests in controllers package"; \
-		KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test ${GOARGS} $$(go list ./... | grep -v '/controllers$$') -coverprofile cover.out; \
-	else \
-		KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test ${GOARGS} ./... -coverprofile cover.out; \
-	fi
+test: ensure-tools fmt vet 	## Run tests
+	KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test  ${GOARGS} ./... -coverprofile cover.out
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
 	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
