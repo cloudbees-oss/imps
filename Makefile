@@ -49,13 +49,8 @@ endif
 all: build
 
 .PHONY: test
-test: fmt vet 	## Run tests
-	@if [ -d "${REPO_ROOT}/bin/envtest/bin/" ]; then \
-		KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test ${GOARGS} ./... -coverprofile cover.out; \
-	else \
-		echo "Warning: envtest not found, running tests without KUBEBUILDER_ASSETS (integration tests may be skipped)"; \
-		go test ${GOARGS} ./... -coverprofile cover.out; \
-	fi
+test: ensure-tools generate fmt vet manifests 	## Run tests
+	KUBEBUILDER_ASSETS="${REPO_ROOT}/bin/envtest/bin/" go test  ${GOARGS} ./... -coverprofile cover.out
 
 bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
 	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
@@ -78,10 +73,10 @@ lint-fix: bin/golangci-lint ## Run linter & fix
 	bin/golangci-lint run -c .golangci.yml --fix
 
 .PHONY: build
-build: fmt vet binary	## Build the binary
+build: generate fmt vet binary	## Build the binary
 
 .PHONY: build-refresher
-build-refresher: fmt vet binary-refresher	## Build the refresher binary
+build-refresher: generate fmt vet binary-refresher	## Build the refresher binary
 
 .PHONY: binary
 binary:					## Build the binary without executing any code generators
