@@ -12,7 +12,8 @@ CRD_OPTIONS ?= "crd"
 # CRD_OPTIONS ?= "crd:trivialVersions=true,allowDangerousTypes=true"
 LICENSEI_VERSION = 0.7.0
 GOLANGCI_VERSION ?= 2.6.1
-ENVTEST_K8S_VERSION = 4.11.1
+# envtest versions and download links are maintained here: https://github.com/kubernetes-sigs/controller-tools/blob/main/envtest-releases.yaml
+ENVTEST_K8S_VERSION = 1.35.0
 
 
 

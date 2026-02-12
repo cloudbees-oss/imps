@@ -18,10 +18,7 @@ if [ ! -e bin/"${target_dir_name}" ]; then
     os=$(go env GOOS)
     arch=$(go env GOARCH)
 
-    # Temporary fix for Apple M1 until envtest is released for darwin-arm64 arch
-    if [ "$os" == "darwin" ] && [ "$arch" == "arm64" ]; then
-        arch="amd64"
-    fi
-
-    curl "https://github.com/kubernetes-sigs/kubebuilder/releases/download/v${version}/kubebuilder_${os}_${arch}" --create-dirs -o bin/"${target_dir_name}"/kubebuilder
+    mkdir -p bin/"${target_dir_name}"
+    curl -sSL "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v${version}/envtest-v${version}-${os}-${arch}.tar.gz" | tar -xz -C /tmp/
+    mv "/tmp/controller-tools/envtest" bin/"${target_dir_name}"/bin
 fi
