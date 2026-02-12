@@ -38,10 +38,13 @@ if [ ! -e bin/"${target_dir_name}" ]; then
             chmod -R 755 /tmp/envtest 2>/dev/null || true
             rm -rf /tmp/envtest
         else
-            # Create placeholder for build compatibility
-            mkdir -p bin/"${target_dir_name}/bin"
-            touch bin/"${target_dir_name}/bin/"{etcd,kube-apiserver,kubectl}
-            chmod +x bin/"${target_dir_name}/bin/"*
+            # Fail explicitly when we can't obtain real binaries
+            echo "ERROR: Failed to install envtest tools. Both download and setup-envtest failed."
+            echo "This likely means:"
+            echo "1. The kubebuilder.io URL is not accessible or returns invalid data"
+            echo "2. setup-envtest tool installation/execution failed"
+            echo "Please check your network connection and Go installation."
+            exit 1
         fi
     fi
     rm -f "$temp_file"
