@@ -22,6 +22,9 @@ if [ ! -e bin/"${target_dir_name}" ]; then
     if [ "$os" == "darwin" ] && [ "$arch" == "arm64" ]; then
         arch="amd64"
     fi
+    
+    echo "Downloading file: https://go.kubebuilder.io/test-tools/$version/$os/$arch"
+    
     curl -sSL "https://go.kubebuilder.io/test-tools/$version/$os/$arch" | tar -xz -C /tmp/
     mv "/tmp/kubebuilder" bin/"${target_dir_name}"
 fi
