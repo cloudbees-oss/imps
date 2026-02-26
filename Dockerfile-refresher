@@ -3,7 +3,7 @@ ARG GID=1000
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.2.1@sha256:8879a398dedf0aadaacfbd332b29ff2f84bc39ae6d4e9c0a1109db27ac5ba012 AS xx
 
-FROM --platform=$BUILDPLATFORM golang:1.25.3-alpine3.22@sha256:aee43c3ccbf24fdffb7295693b6e33b21e01baec1b2a55acc351fde345e9ec34 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.0-alpine3.22 AS builder
 ARG UID
 ARG GID
 
@@ -54,7 +54,7 @@ USER ${UID}:${GID}
 ENTRYPOINT ["/manager"]
 
 
-FROM gcr.io/distroless/base-debian12:latest@sha256:347a41e7f263ea7f7aba1735e5e5b1439d9e41a9f09179229f8c13ea98ae94cf AS distroless
+FROM gcr.io/distroless/base-debian12:latest@sha256:937c7eaaf6f3f2d38a1f8c4aeff326f0c56e4593ea152e9e8f74d976dde52f56 AS distroless
 ARG UID
 ARG GID
 

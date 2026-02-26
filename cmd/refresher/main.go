@@ -84,7 +84,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sourceSecrets := []types.NamespacedName{}
+	sourceSecrets := make([]types.NamespacedName, 0, len(*sourceSecretStrings))
 	for _, sourceSecertString := range *sourceSecretStrings {
 		sourceSecret, err := refToNamespacedName(sourceSecertString)
 		if err != nil {
