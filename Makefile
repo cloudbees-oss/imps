@@ -11,7 +11,7 @@ CRD_OPTIONS ?= "crd"
 # TODO: Use this when allowDangerousTypes feature is released to support floats
 # CRD_OPTIONS ?= "crd:trivialVersions=true,allowDangerousTypes=true"
 LICENSEI_VERSION = 0.7.0
-GOLANGCI_VERSION ?= 2.6.1
+GOLANGCI_VERSION ?= 2.10.1
 # envtest versions and download links are maintained here: https://github.com/kubernetes-sigs/controller-tools/blob/main/envtest-releases.yaml
 ENVTEST_K8S_VERSION = 1.35.0
 
