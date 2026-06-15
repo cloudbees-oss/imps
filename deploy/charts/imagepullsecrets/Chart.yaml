@@ -4,10 +4,10 @@ description: Dynamically manage pull secrets for images
 home: https://banzaicloud.com
 
 maintainers:
-- email: info@banzaicloud.com
-  name: Banzai Cloud
+- email: engineering@cloudbees.com
+  name: CloudBees Inc.
 sources:
-- https://github.com/banzaicloud/backyards
+- https://github.com/cloudbees-oss/imps
 
-version: 0.3.18
-appVersion: 0.3.18
+version: 0.3.19
+appVersion: 0.3.19
