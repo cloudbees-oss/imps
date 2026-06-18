@@ -76,8 +76,8 @@ func TestStringableCredentials_ToAwsConfig(t *testing.T) {
 			name: "explicit credentials with role",
 			stringableCredentials: &StringableCredentials{
 				Credentials: aws.Credentials{
-					AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
-					SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					AccessKeyID:     "ASIA_TEST_KEY_EXAMPLE",
+					SecretAccessKey: "test_secret_key_for_unit_tests_only",
 				},
 				Region:  "testRegion",
 				RoleArn: "arn:aws:iam::123456789012:role/test-role",
@@ -90,8 +90,8 @@ func TestStringableCredentials_ToAwsConfig(t *testing.T) {
 			name: "explicit credentials without role",
 			stringableCredentials: &StringableCredentials{
 				Credentials: aws.Credentials{
-					AccessKeyID:     "AKIAIOSFODNN7EXAMPLE",
-					SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+					AccessKeyID:     "ASIA_TEST_KEY_EXAMPLE",
+					SecretAccessKey: "test_secret_key_for_unit_tests_only",
 				},
 				Region: "testRegion",
 			},
