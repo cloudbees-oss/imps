@@ -92,7 +92,10 @@ func TestTokenManager_GetAuthorizationToken(t *testing.T) {
 			if tt.expectedErr != nil {
 				assert.Equal(t, tt.expectedErr.Error(), err.Error())
 			} else {
-				assert.DeepEqual(t, tt.wanted, found)
+				// Compare only the exported fields we care about
+				assert.Equal(t, tt.wanted.AuthorizationToken, found.AuthorizationToken)
+				assert.Equal(t, tt.wanted.ProxyEndpoint, found.ProxyEndpoint)
+				assert.Equal(t, tt.wanted.ExpiresAt, found.ExpiresAt)
 				assert.NilError(t, err)
 			}
 		})
@@ -199,10 +202,10 @@ func TestTokenManager_updateTokens(t *testing.T) {
 			tt.tokenManager.updateTokens()
 
 			assert.Equal(t, len(tt.tokenManager.ManagedTokens), 1)
-			assert.DeepEqual(t, tt.tokenManager.ManagedTokens["testName"].CurrentToken, &types.AuthorizationData{
-				AuthorizationToken: &testTokenName,
-				ExpiresAt:          &newExpiryTime,
-			})
+			// Compare only exported fields to avoid issues with unexported fields in newer SDK
+			token := tt.tokenManager.ManagedTokens["testName"].CurrentToken
+			assert.Equal(t, token.AuthorizationToken, &testTokenName)
+			assert.Equal(t, token.ExpiresAt, &newExpiryTime)
 		})
 	}
 }
