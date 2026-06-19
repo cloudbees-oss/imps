@@ -9,5 +9,5 @@ maintainers:
 sources:
 - https://github.com/cloudbees-oss/imps
 
-version: 0.3.19
-appVersion: 0.3.19
+version: 0.3.20
+appVersion: 0.3.20
