@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
@@ -36,15 +37,29 @@ func (c *StringableCredentials) GetCreds(_ context.Context) (aws.Credentials, er
 }
 
 func (c *StringableCredentials) ToAwsConfig() aws.Config {
-	cfg := aws.Config{
-		Region: c.Region,
-		Credentials: aws.CredentialsProviderFunc(func(_ context.Context) (aws.Credentials, error) {
-			return c.Credentials, nil
-		}),
+	ctx := context.Background()
+
+	// Always load default config to get HTTPClient and middleware
+	// This is required for request signing to work properly
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(c.Region))
+	if err != nil {
+		// If LoadDefaultConfig fails completely, we can't proceed safely
+		// Return a basic config and let the error surface later
+		return aws.Config{Region: c.Region}
 	}
+
+	// If explicit credentials are provided, override the credential provider
+	if c.AccessKeyID != "" {
+		cfg.Credentials = aws.CredentialsProviderFunc(func(_ context.Context) (aws.Credentials, error) {
+			return c.Credentials, nil
+		})
+	}
+	// Otherwise, cfg already has credentials from default chain (including IRSA)
+
+	// If roleArn is specified in the secret, assume that role
 	if len(c.RoleArn) != 0 {
-		// Create the credentials from AssumeRoleProvider to assume the role
-		// referenced by the `RoleArn`.
+		// The cfg has either explicit credentials or IRSA credentials
+		// Now assume the target role using those base credentials
 		stsSvc := sts.NewFromConfig(cfg)
 		creds := stscreds.NewAssumeRoleProvider(stsSvc, c.RoleArn)
 		cfg.Credentials = aws.NewCredentialsCache(creds)
