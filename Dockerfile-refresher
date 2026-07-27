@@ -54,7 +54,7 @@ USER ${UID}:${GID}
 ENTRYPOINT ["/manager"]
 
 
-FROM gcr.io/distroless/base-debian12:latest@sha256:58695f439f772a00009c8f6be4c183f824c1f556d74b313c30900f167e4772f8 AS distroless
+FROM gcr.io/distroless/base-debian12:latest@sha256:62730825d3cf03571e0a1b8f014748de94d0404500f063593b614c23da38841d AS distroless
 ARG UID
 ARG GID
 
