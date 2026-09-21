@@ -72,6 +72,7 @@ jobs:
           syft-version: v0.76.1
 
       - name: Configure AWS credentials
+        if: inputs.publish
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ECR_IAM_ROLE }}
@@ -79,6 +80,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
+        if: inputs.publish
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set image name
@@ -233,6 +235,7 @@ jobs:
           syft-version: v0.76.1
 
       - name: Configure AWS credentials
+        if: inputs.publish
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ECR_IAM_ROLE }}
@@ -240,6 +243,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
+        if: inputs.publish
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set image name
